@@ -9,60 +9,68 @@
 class Float : public Variable
 {
 public:
-    Float(std::string name) {
+    Float(std::string name, Context *context) {
         this->tree = new Tree(name, "float", ParentType::Argument);
+        this->context = context;
     }
 
     Float(Float &other) {
         this->tree = new Tree(Namer::next(), "float", ParentType::Declaration);
         this->tree->parents.push_back(other.tree);
-        other.tree->children.push_back(this->tree);
+        this->context = other.context;
+
+        context->record(this->tree, other.tree);
     }
 
-    Float(std::string parent_symbol, ParentType parent_type, std::initializer_list<Variable*> parents) {
+    Float(Context *context, std::string parent_symbol, ParentType parent_type, std::initializer_list<Variable*> parents) {
         this->tree = new Tree(parent_symbol, "float", parent_type);
-        for (Variable *parent : parents) {
+        this->context = context;
+        for (Variable *parent : parents)
             this->tree->parents.push_back(parent->tree);
-            parent->tree->children.push_back(this->tree);
-        }
     }
 
     Float& operator=(Float &other)
     {
-        this->tree = new Tree(Namer::next(), "float", ParentType::Declaration);
+        this->tree = new Tree(this->tree->token, "float", ParentType::AssignOperator);
         this->tree->parents.push_back(other.tree);
-        other.tree->children.push_back(this->tree);
+        this->context = other.context;
+
+        context->record(this->tree, other.tree);
         return *this;
     }
     
     Float& operator+(Float &other)
     {
-        Float *result = new Float("+", ParentType::BinaryOperator, {this, &other});
+        Float *result = new Float(other.context, "+", ParentType::BinaryOperator, {this, &other});
         return *result;
     }
 
     Float& operator-(Float &other)
     {
-        Float *result = new Float("-", ParentType::BinaryOperator, {this, &other});
+        Float *result = new Float(other.context, "-", ParentType::BinaryOperator, {this, &other});
         return *result;
     }
 
     Float& operator*(Float &other)
     {
-        Float *result = new Float("*", ParentType::BinaryOperator, {this, &other});
+        Float *result = new Float(other.context, "*", ParentType::BinaryOperator, {this, &other});
         return *result;
     }
 
     Float& operator/(Float &other)
     {
-        Float *result = new Float("/", ParentType::BinaryOperator, {this, &other});
+        Float *result = new Float(other.context, "/", ParentType::BinaryOperator, {this, &other});
         return *result;
     }
 
     Float& operator%(Float &other)
     {
-        Float *result = new Float("%", ParentType::BinaryOperator, {this, &other});
+        Float *result = new Float(other.context, "%", ParentType::BinaryOperator, {this, &other});
         return *result;
+    }
+    
+    std::string get_declaration() {
+        return "float " + tree->token;
     }
 };
 
