@@ -25,10 +25,10 @@ namespace GLSL
     {
     public:
         Tree *tree;
-        virtual std::string get_declaration() = 0;
+        static std::string type_name();
     };
 
-    template <typename T, typename ...Args>
+    template <typename T, typename... Args>
     class Function
     {
     public:
@@ -38,12 +38,14 @@ namespace GLSL
 
         Function(std::string symbol) : symbol(symbol) {}
 
-        std::vector<Tree *> unwrap_others() {
+        std::vector<Tree *> unwrap_others()
+        {
             return std::vector<Tree *>();
         }
 
-        template <typename U, typename ...Args_>
-        std::vector<Tree *> unwrap_others(U &u, Args_ &...others) {
+        template <typename U, typename... Args_>
+        std::vector<Tree *> unwrap_others(U &u, Args_ &...others)
+        {
             std::vector<Tree *> unwraped = unwrap_others(others...);
             unwraped.insert(unwraped.begin(), u.tree);
 
@@ -119,43 +121,50 @@ namespace GLSL
     static int arg_index = 0;
     static std::string argument_declaration = "";
 
-    template <typename T>
-    static auto bind_args(std::function<T()> func) {
-        return func;
+    template <typename T, typename A>
+    static T bind_args(std::function<T(A&)> func, A &arg)
+    {
+        argument_declaration += A::type_name() + " " + arg.tree->token;
+        return func(arg);
     }
-    
-    template <typename T, typename A, typename ...Args>
-    static auto bind_args(std::function<T(A&, Args&...)> func) {
-        auto result = std::bind(func, A("a" + std::to_string(arg_index)));
-        std::function<T(Args&...)> binded = [&](Args&... args) -> T {
-            return result(args...);
+
+    template <typename T, typename A1, typename A2, typename... Args>
+    static T bind_args(std::function<T(A1 &, A2 &, Args &...)> func, A1 &a1)
+    {
+        argument_declaration += A1::type_name() + " " + a1.tree->token + ", ";
+
+        std::function<T(A2 &, Args & ...)> bound = [&](A2 &a2, Args &...others) -> T
+        {
+            return func(a1, a2, others...);
         };
 
-        return bind_args(binded);
+        A2 a2("a" + std::to_string(arg_index++));
+        return bind_args(bound, a2);
     }
 
-    template <typename T, typename ...F>
-    static Function<T, F...> Parse(std::function<T(F &...)> func, std::string func_name)
+    template <typename T, typename A, typename... Args>
+    static Function<T, A, Args...> Parse(std::function<T(A &, Args &...)> func, std::string func_name)
     {
         recorder.clear();
         arg_index = 0;
+        argument_declaration = "";
 
-        auto binded = bind_args(func);
-        T t = binded();
+        A a("a" + std::to_string(arg_index++));
+        T t = bind_args<T, A, Args...>(func, a);
+        
 
-        Function<T, F...> function(func_name);
+        Function<T, A, Args...> function(func_name);
 
-        // std::string header = t.tree->glsl_type + " " + func_name +
-        //                      "(" + a1.get_declaration() + ", " + a2.get_declaration() + ")";
-        // std::string footer = "}\n";
+        std::string header = t.tree->glsl_type + " " + func_name + "(" + argument_declaration + ")";
+        std::string footer = "}\n";
 
-        // function.definition = header + " {\n";
-        // for (std::string line : recorder)
-        //     function.definition += line;
-        // function.definition += "\treturn " + tree->get_expression() + ";\n";
-        // function.definition += footer;
+        function.definition = header + " {\n";
+        for (std::string line : recorder)
+            function.definition += line;
+        function.definition += "\treturn " + t.tree->get_expression() + ";\n";
+        function.definition += footer;
 
-        // function.declaration = header + ";\n";
+        function.declaration = header + ";\n";
 
         return function;
     }

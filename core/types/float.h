@@ -68,9 +68,9 @@ namespace GLSL
             return *result;
         }
 
-        std::string get_declaration()
+        static std::string type_name()
         {
-            return "float " + tree->token;
+            return "float";
         }
     };
 }
