@@ -20,16 +20,40 @@ namespace GLSL
 
     class Tree;
     class Variable;
-    class Context;
-    class Parser;
 
     class Variable
     {
     public:
         Tree *tree;
-        Context *context;
-
         virtual std::string get_declaration() = 0;
+    };
+
+    template <typename T, typename ...Args>
+    class Function
+    {
+    public:
+        std::string declaration;
+        std::string definition;
+        std::string symbol;
+
+        Function(std::string symbol) : symbol(symbol) {}
+
+        std::vector<Tree *> unwrap_others() {
+            return std::vector<Tree *>();
+        }
+
+        template <typename U, typename ...Args_>
+        std::vector<Tree *> unwrap_others(U &u, Args_ &...others) {
+            std::vector<Tree *> unwraped = unwrap_others(others...);
+            unwraped.insert(unwraped.begin(), u.tree);
+
+            return unwraped;
+        }
+
+        T &operator()(Args &...others)
+        {
+            return *(new T(symbol, ParentType::Function, unwrap_others(others...)));
+        }
     };
 
     class Tree
@@ -76,48 +100,64 @@ namespace GLSL
         }
     };
 
-    class Context
+    static std::vector<std::string> recorder;
+    static void record(Tree *lhs, Tree *rhs)
     {
-    public:
-        std::vector<std::string> recorder;
-
-        void record(Tree *lhs, Tree *rhs)
+        switch (lhs->parent_type)
         {
-            switch (lhs->parent_type)
-            {
-            case ParentType::AssignOperator:
-                recorder.push_back("\t" + lhs->get_expression() + " = " + rhs->get_expression() + ";\n");
-                break;
-            case ParentType::Declaration:
-                recorder.push_back("\t" + lhs->glsl_type + " " + lhs->token + " = " + rhs->get_expression() + ";\n");
-                break;
-            default:
-                break;
-            }
+        case ParentType::AssignOperator:
+            recorder.push_back("\t" + lhs->get_expression() + " = " + rhs->get_expression() + ";\n");
+            break;
+        case ParentType::Declaration:
+            recorder.push_back("\t" + lhs->glsl_type + " " + lhs->token + " = " + rhs->get_expression() + ";\n");
+            break;
+        default:
+            break;
         }
-    };
+    }
 
-    template <typename T, typename A1, typename A2>
-    static std::string Parse(std::function<T(A1 &, A2 &)> func, std::string func_name)
+    static int arg_index = 0;
+    static std::string argument_declaration = "";
+
+    template <typename T>
+    static auto bind_args(std::function<T()> func) {
+        return func;
+    }
+    
+    template <typename T, typename A, typename ...Args>
+    static auto bind_args(std::function<T(A&, Args&...)> func) {
+        auto result = std::bind(func, A("a" + std::to_string(arg_index)));
+        std::function<T(Args&...)> binded = [&](Args&... args) -> T {
+            return result(args...);
+        };
+
+        return bind_args(binded);
+    }
+
+    template <typename T, typename ...F>
+    static Function<T, F...> Parse(std::function<T(F &...)> func, std::string func_name)
     {
-        Context *context = new Context();
+        recorder.clear();
+        arg_index = 0;
 
-        A1 a1("a1", context);
-        A2 a2("a2", context);
-        T execution_result = func(a1, a2);
-        Tree *tree = execution_result.tree;
+        auto binded = bind_args(func);
+        T t = binded();
 
-        std::string header = tree->glsl_type + " " + func_name +
-                             "(" + a1.get_declaration() + ", " + a2.get_declaration() + ") {\n";
-        std::string footer = "}\n";
+        Function<T, F...> function(func_name);
 
-        std::string result = header;
-        for (std::string line : context->recorder)
-            result += line;
-        result += "\treturn " + tree->get_expression() + ";\n";
-        result += footer;
+        // std::string header = t.tree->glsl_type + " " + func_name +
+        //                      "(" + a1.get_declaration() + ", " + a2.get_declaration() + ")";
+        // std::string footer = "}\n";
 
-        return result;
+        // function.definition = header + " {\n";
+        // for (std::string line : recorder)
+        //     function.definition += line;
+        // function.definition += "\treturn " + tree->get_expression() + ";\n";
+        // function.definition += footer;
+
+        // function.declaration = header + ";\n";
+
+        return function;
     }
 } // namespace GLSL
 
