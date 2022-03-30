@@ -10,13 +10,14 @@ namespace GLSL
     enum class ParentType
     {
         None = 0,
-        Argument = 1,
-        Function = 2,
-        UnaryOperator = 3,
-        BinaryOperator = 4,
-        AssignOperator = 5,
-        Declaration = 6,
-        Constructor = 7,
+        Argument,
+        Member,
+        Function,
+        UnaryOperator,
+        BinaryOperator,
+        AssignOperator,
+        Declaration,
+        Constructor,
     };
 
     class Tree;
@@ -26,6 +27,8 @@ namespace GLSL
     {
     public:
         Tree *tree;
+
+        virtual void set_origin(Tree *origin) = 0;
         virtual std::string get_symbol() = 0;
         static std::string type_name();
     };
@@ -67,6 +70,7 @@ namespace GLSL
         std::string token;
         std::string glsl_type;
         ParentType parent_type;
+
         Tree *origin;
 
         Tree(std::string token, std::string glsl_type, ParentType parent_type = ParentType::None)
@@ -83,6 +87,10 @@ namespace GLSL
             case ParentType::AssignOperator:
             case ParentType::Declaration:
                 return token;
+            case ParentType::Member:
+            {
+                return origin->get_expression() + "." + token;
+            }
             case ParentType::Function:
             {
                 std::string expression = token + "(";
@@ -99,6 +107,18 @@ namespace GLSL
                 return "(" + token + parents[0]->get_expression() + ")";
             case ParentType::BinaryOperator:
                 return "(" + parents[0]->get_expression() + " " + token + " " + parents[1]->get_expression() + ")";
+            case ParentType::Constructor:
+            {
+                std::string expression = glsl_type + "(";
+                for (int i = 0; i < parents.size(); i++)
+                {
+                    expression += parents[i]->get_expression();
+                    if (i != parents.size() - 1)
+                        expression += ", ";
+                }
+                expression += ")";
+                return expression;
+            }
             default:
                 return "";
             }
@@ -111,9 +131,8 @@ namespace GLSL
         switch (tree->parent_type)
         {
         case ParentType::AssignOperator:
-        {
             recorder.push_back("\t" + tree->token + " = " + tree->parents[0]->get_expression());
-        }
+            break;
         case ParentType::Declaration:
             recorder.push_back("\t" + tree->glsl_type + " " + tree->token + " = " + tree->parents[0]->get_expression() + ";\n");
             break;

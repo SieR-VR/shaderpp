@@ -4,12 +4,30 @@
 #include "parser.h"
 
 #include "types/float.h"
+#include "types/vec2.h"
 
 namespace GLSL
 {
-    Function<Float, Float> sin("sin");
-    Function<Float, Float> cos("cos");
-    Function<Float, Float> tan("tan");
+    template <typename T>
+    T &sin(T &a)
+    {
+        T *result = new T("sin", ParentType::Function, {a.tree});
+        return *result;
+    }
+
+    template <typename T>
+    T &cos(T &a)
+    {
+        T *result = new T("cos", ParentType::Function, {a.tree});
+        return *result;
+    }
+
+    template <typename T>
+    T &tan(T &a)
+    {
+        T *result = new T("tan", ParentType::Function, {a.tree});
+        return *result;
+    }
 }
 
 #endif

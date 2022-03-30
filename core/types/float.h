@@ -9,10 +9,11 @@ namespace GLSL
     class Float : public Variable
     {
     public:
+        Float() = delete;
 
-        Float(std::string name) 
+        Float(std::string name, ParentType parent_type = ParentType::Argument)
         {
-            this->tree = new Tree(name, "float", ParentType::Argument);
+            this->tree = new Tree(name, "float", parent_type);
         }
 
         Float(Float &other)
@@ -67,6 +68,11 @@ namespace GLSL
         {
             Float *result = new Float("%", ParentType::BinaryOperator, {this->tree, other.tree});
             return *result;
+        }
+
+        void set_origin(Tree *origin) {
+            this->tree->origin = origin;
+            this->tree->parent_type = ParentType::Member;
         }
 
         std::string get_symbol()
