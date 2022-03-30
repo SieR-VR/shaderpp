@@ -16,6 +16,7 @@ namespace GLSL
         BinaryOperator = 4,
         AssignOperator = 5,
         Declaration = 6,
+        Constructor = 7,
     };
 
     class Tree;
@@ -25,6 +26,7 @@ namespace GLSL
     {
     public:
         Tree *tree;
+        virtual std::string get_symbol() = 0;
         static std::string type_name();
     };
 
@@ -65,6 +67,7 @@ namespace GLSL
         std::string token;
         std::string glsl_type;
         ParentType parent_type;
+        Tree *origin;
 
         Tree(std::string token, std::string glsl_type, ParentType parent_type = ParentType::None)
             : token(token), glsl_type(glsl_type), parent_type(parent_type)
@@ -103,15 +106,16 @@ namespace GLSL
     };
 
     static std::vector<std::string> recorder;
-    static void record(Tree *lhs, Tree *rhs)
+    static void record(Tree *tree)
     {
-        switch (lhs->parent_type)
+        switch (tree->parent_type)
         {
         case ParentType::AssignOperator:
-            recorder.push_back("\t" + lhs->get_expression() + " = " + rhs->get_expression() + ";\n");
-            break;
+        {
+            recorder.push_back("\t" + tree->token + " = " + tree->parents[0]->get_expression());
+        }
         case ParentType::Declaration:
-            recorder.push_back("\t" + lhs->glsl_type + " " + lhs->token + " = " + rhs->get_expression() + ";\n");
+            recorder.push_back("\t" + tree->glsl_type + " " + tree->token + " = " + tree->parents[0]->get_expression() + ";\n");
             break;
         default:
             break;
@@ -122,14 +126,14 @@ namespace GLSL
     static std::string argument_declaration = "";
 
     template <typename T, typename A>
-    static T bind_args(std::function<T(A&)> func, A &arg)
+    static T execute(std::function<T(A&)> func, A &arg)
     {
         argument_declaration += A::type_name() + " " + arg.tree->token;
         return func(arg);
     }
 
     template <typename T, typename A1, typename A2, typename... Args>
-    static T bind_args(std::function<T(A1 &, A2 &, Args &...)> func, A1 &a1)
+    static T execute(std::function<T(A1 &, A2 &, Args &...)> func, A1 &a1)
     {
         argument_declaration += A1::type_name() + " " + a1.tree->token + ", ";
 
@@ -139,7 +143,7 @@ namespace GLSL
         };
 
         A2 a2("a" + std::to_string(arg_index++));
-        return bind_args(bound, a2);
+        return execute(bound, a2);
     }
 
     template <typename T, typename A, typename... Args>
@@ -150,8 +154,7 @@ namespace GLSL
         argument_declaration = "";
 
         A a("a" + std::to_string(arg_index++));
-        T t = bind_args<T, A, Args...>(func, a);
-        
+        T t = execute<T, A, Args...>(func, a);
 
         Function<T, A, Args...> function(func_name);
 

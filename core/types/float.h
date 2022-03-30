@@ -9,7 +9,8 @@ namespace GLSL
     class Float : public Variable
     {
     public:
-        Float(std::string name)
+
+        Float(std::string name) 
         {
             this->tree = new Tree(name, "float", ParentType::Argument);
         }
@@ -19,7 +20,7 @@ namespace GLSL
             this->tree = new Tree(Namer::next(), "float", ParentType::Declaration);
             this->tree->parents.push_back(other.tree);
 
-            record(this->tree, other.tree);
+            record(this->tree);
         }
 
         Float(std::string parent_symbol, ParentType parent_type, std::vector<Tree *> parents)
@@ -31,10 +32,10 @@ namespace GLSL
 
         Float &operator=(Float &other)
         {
-            this->tree = new Tree(this->tree->token, "float", ParentType::AssignOperator);
+            this->tree = new Tree(get_symbol(), "float", ParentType::AssignOperator);
             this->tree->parents.push_back(other.tree);
 
-            record(this->tree, other.tree);
+            record(this->tree);
             return *this;
         }
 
@@ -66,6 +67,11 @@ namespace GLSL
         {
             Float *result = new Float("%", ParentType::BinaryOperator, {this->tree, other.tree});
             return *result;
+        }
+
+        std::string get_symbol()
+        {
+            return tree->token;
         }
 
         static std::string type_name()

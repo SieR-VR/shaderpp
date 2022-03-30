@@ -9,6 +9,7 @@ namespace GLSL
 {
     Function<Float, Float> sin("sin");
     Function<Float, Float> cos("cos");
+    Function<Float, Float> tan("tan");
 }
 
 #endif
