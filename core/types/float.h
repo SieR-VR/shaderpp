@@ -64,22 +64,6 @@ namespace GLSL
             return *result;
         }
 
-        Float &operator%(Float &other)
-        {
-            Float *result = new Float("%", ParentType::BinaryOperator, {this->tree, other.tree});
-            return *result;
-        }
-
-        void set_origin(Tree *origin) {
-            this->tree->origin = origin;
-            this->tree->parent_type = ParentType::Member;
-        }
-
-        std::string get_symbol()
-        {
-            return tree->token;
-        }
-
         static std::string type_name()
         {
             return "float";

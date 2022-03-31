@@ -5,27 +5,25 @@
 
 #include "types/float.h"
 #include "types/vec2.h"
+#include "types/int.h"
 
 namespace GLSL
 {
-    template <typename T>
-    T &sin(T &a)
+    Float &sin(Float &a)
     {
-        T *result = new T("sin", ParentType::Function, {a.tree});
+        Float *result = new Float("sin", ParentType::Function, {a.tree});
         return *result;
     }
 
-    template <typename T>
-    T &cos(T &a)
+    Float &cos(Float &a)
     {
-        T *result = new T("cos", ParentType::Function, {a.tree});
+        Float *result = new Float("cos", ParentType::Function, {a.tree});
         return *result;
     }
 
-    template <typename T>
-    T &tan(T &a)
+    Float &tan(Float &a)
     {
-        T *result = new T("tan", ParentType::Function, {a.tree});
+        Float *result = new Float("tan", ParentType::Function, {a.tree});
         return *result;
     }
 }

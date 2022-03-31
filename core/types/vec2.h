@@ -86,7 +86,7 @@ namespace GLSL
 
         Vec2 &operator=(Vec2 &other)
         {
-            this->tree = new Tree(this->tree->token, "vec2", ParentType::AssignOperator);
+            this->tree = new Tree(get_symbol(), "vec2", ParentType::AssignOperator);
             this->tree->parents.push_back(other.tree);
 
             record(this->tree);
@@ -127,12 +127,6 @@ namespace GLSL
         {
             Vec2 *result = new Vec2("/", ParentType::BinaryOperator, {this->tree, other.tree});
             return *result;
-        }
-
-        void set_origin(Tree *origin)
-        {
-            this->tree->origin = origin;
-            this->tree->parent_type = ParentType::Member;
         }
 
         std::string get_symbol() {

@@ -23,16 +23,6 @@ namespace GLSL
     class Tree;
     class Variable;
 
-    class Variable
-    {
-    public:
-        Tree *tree;
-
-        virtual void set_origin(Tree *origin) = 0;
-        virtual std::string get_symbol() = 0;
-        static std::string type_name();
-    };
-
     template <typename T, typename... Args>
     class Function
     {
@@ -125,16 +115,34 @@ namespace GLSL
         }
     };
 
+    class Variable
+    {
+    public:
+        Tree *tree;
+
+        void set_origin(Tree *origin) {
+            this->tree->origin = origin;
+            this->tree->parent_type = ParentType::Member;
+        }
+
+        std::string get_symbol() {
+            return this->tree->get_expression();
+        }
+        
+        static std::string type_name();
+    };
+
     static std::vector<std::string> recorder;
     static void record(Tree *tree)
     {
         switch (tree->parent_type)
         {
         case ParentType::AssignOperator:
-            recorder.push_back("\t" + tree->token + " = " + tree->parents[0]->get_expression());
+            recorder.push_back("\t" + tree->get_expression() + " = " + tree->parents[0]->get_expression() + ";\n");
             break;
         case ParentType::Declaration:
-            recorder.push_back("\t" + tree->glsl_type + " " + tree->token + " = " + tree->parents[0]->get_expression() + ";\n");
+            recorder.push_back("\t" + tree->glsl_type + " " + tree->token + 
+                (tree->parents.size() ? " = " + tree->parents[0]->get_expression() : "") + ";\n");
             break;
         default:
             break;
