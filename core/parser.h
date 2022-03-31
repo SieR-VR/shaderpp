@@ -62,10 +62,16 @@ namespace GLSL
         ParentType parent_type;
 
         Tree *origin;
+        std::vector<Tree *> branches;
 
         Tree(std::string token, std::string glsl_type, ParentType parent_type = ParentType::None)
             : token(token), glsl_type(glsl_type), parent_type(parent_type)
         {
+        }
+
+        std::string get_declaration()
+        {
+            return glsl_type + " " + token;
         }
 
         std::string get_expression()
@@ -123,13 +129,36 @@ namespace GLSL
         void set_origin(Tree *origin) {
             this->tree->origin = origin;
             this->tree->parent_type = ParentType::Member;
+
+            origin->branches.push_back(this->tree);
         }
 
         std::string get_symbol() {
             return this->tree->get_expression();
         }
-        
-        static std::string type_name();
+    };
+
+    template <typename T>
+    class Struct
+    {
+    public:
+        std::string declaration;
+        std::string definition;
+        std::string symbol;
+
+        Struct()
+        {
+            T *t = new T();
+
+            this->symbol = t->tree->glsl_type;
+            this->declaration = "struct " + this->symbol + ";\n";
+            this->definition = "struct " + this->symbol + " {\n";
+
+            for (Tree *tree : t->tree->branches)
+                this->definition += "\t" + tree->get_declaration() + ";\n";
+
+            this->definition += "};\n";
+        }
     };
 
     static std::vector<std::string> recorder;
@@ -155,14 +184,14 @@ namespace GLSL
     template <typename T, typename A>
     static T execute(std::function<T(A&)> func, A &arg)
     {
-        argument_declaration += A::type_name() + " " + arg.tree->token;
+        argument_declaration += arg.tree->get_declaration();
         return func(arg);
     }
 
     template <typename T, typename A1, typename A2, typename... Args>
     static T execute(std::function<T(A1 &, A2 &, Args &...)> func, A1 &a1)
     {
-        argument_declaration += A1::type_name() + " " + a1.tree->token + ", ";
+        argument_declaration += a1.tree->get_declaration() + ", ";
 
         std::function<T(A2 &, Args & ...)> bound = [&](A2 &a2, Args &...others) -> T
         {

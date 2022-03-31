@@ -84,7 +84,7 @@ namespace GLSL
             t.set_origin(this->tree);
         }
 
-        Vec2 &operator=(Vec2 &other)
+        Vec2 &operator=(const Vec2 &other)
         {
             this->tree = new Tree(get_symbol(), "vec2", ParentType::AssignOperator);
             this->tree->parents.push_back(other.tree);
@@ -93,48 +93,40 @@ namespace GLSL
             return *this;
         }
 
-        Vec2 &operator+(Vec2 &other)
+        Vec2 &operator+(const Vec2 &other)
         {
             Vec2 *result = new Vec2("+", ParentType::BinaryOperator, {this->tree, other.tree});
             return *result;
         }
 
-        Vec2 &operator-(Vec2 &other)
+        Vec2 &operator-(const Vec2 &other)
         {
             Vec2 *result = new Vec2("-", ParentType::BinaryOperator, {this->tree, other.tree});
             return *result;
         }
 
-        Vec2 &operator*(Vec2 &other)
+        Vec2 &operator*(const Vec2 &other)
         {
             Vec2 *result = new Vec2("*", ParentType::BinaryOperator, {this->tree, other.tree});
             return *result;
         }
 
-        Vec2 &operator/(Vec2 &other)
+        Vec2 &operator/(const Vec2 &other)
         {
             Vec2 *result = new Vec2("/", ParentType::BinaryOperator, {this->tree, other.tree});
             return *result;
         }
 
-        Vec2 &operator*(Float &other)
+        Vec2 &operator*(const Float &other)
         {
             Vec2 *result = new Vec2("*", ParentType::BinaryOperator, {this->tree, other.tree});
             return *result;
         }
 
-        Vec2 &operator/(Float &other)
+        Vec2 &operator/(const Float &other)
         {
             Vec2 *result = new Vec2("/", ParentType::BinaryOperator, {this->tree, other.tree});
             return *result;
-        }
-
-        std::string get_symbol() {
-            return tree->token;
-        }
-
-        static std::string type_name() {
-            return "vec2";
         }
     };
 }

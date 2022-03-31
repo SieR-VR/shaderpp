@@ -39,11 +39,6 @@ namespace GLSL
             record(this->tree);
             return *this;
         }
-
-        static std::string type_name()
-        {
-            return "int";
-        }
     };
 }
 

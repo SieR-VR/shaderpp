@@ -63,11 +63,6 @@ namespace GLSL
             Float *result = new Float("/", ParentType::BinaryOperator, {this->tree, other.tree});
             return *result;
         }
-
-        static std::string type_name()
-        {
-            return "float";
-        }
     };
 }
 
