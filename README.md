@@ -1,8 +1,29 @@
-# ASTGEN
+# shaderpp
 
-# 아직 완성되지 않은 라이브러리입니다.
-## 2022년 4월 이내에 첫 릴리즈를 배포할 예정입니다.
+# Table of Contents
+1. [Requirements](#requirements)
+2. [Example](#example)
 
-이 라이브러리는 GLSL 코드가 C에 기반한다는 것을 바탕으로, C++ Lambda로부터 GLSL 코드를 생성합니다.
+## Requirements
 
-원리는 딥 러닝 프레임워크와 비슷하게, 함수에 프록시 객체를 통과시키고 얻어낸 정보를 바탕으로 함수를 문자열로 재구성합니다.
+* C++ 17 or newer
+
+## Example
+
+C++ Code:
+```c++
+std::function<Float(Float&, Float&)> func = [](Float& a0, Float& a1) {
+    return a0 * a1;
+}
+
+auto func_parsed = Parse(func, "func");
+```
+
+Auto Generated GLSL Code:
+```glsl
+func(float a0, float a1);
+
+func(float a0, float a1) {
+    return a0 * a1;
+}
+```
