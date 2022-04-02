@@ -15,73 +15,51 @@ namespace GLSL
 
         Vec2() = delete;
 
-        Vec2(std::string symbol)
-            : x("x"), y("y"), r("r"), g("g"), s("s"), t("t")
+        Vec2(std::string symbol, ParentType parent_type = ParentType::Argument)
+            : Variable(new Tree(symbol, "vec2", ParentType::Argument)),
+              x("x", this), y("y", this),
+              r("r", this), g("g", this),
+              s("s", this), t("t", this)
         {
-            this->tree = new Tree(symbol, "vec2", ParentType::Argument);
+        }
 
-            x.set_origin(this->tree);
-            y.set_origin(this->tree);
-
-            r.set_origin(this->tree);
-            g.set_origin(this->tree);
-
-            s.set_origin(this->tree);
-            t.set_origin(this->tree);
+        Vec2(std::string symbol, Variable *origin)
+            : Variable(new Tree(symbol, "vec2", ParentType::Member, origin->tree)),
+              x("x", this), y("y", this),
+              r("r", this), g("g", this),
+              s("s", this), t("t", this)
+        {
         }
 
         Vec2(Vec2 &other)
-            : x("x"), y("y"), r("r"), g("g"), s("s"), t("t")
+            : Variable(new Tree(Namer::next(), "vec2", ParentType::Declaration)),
+              x("x", this), y("y", this),
+              r("r", this), g("g", this),
+              s("s", this), t("t", this)
         {
-            this->tree = new Tree(Namer::next(), "vec2", ParentType::Declaration);
-            this->tree->parents.push_back(other.tree);
-
             record(this->tree);
-
-            x.set_origin(this->tree);
-            y.set_origin(this->tree);
-
-            r.set_origin(this->tree);
-            g.set_origin(this->tree);
-
-            s.set_origin(this->tree);
-            t.set_origin(this->tree);
         }
 
         Vec2(std::string parent_symbol, ParentType parent_type, std::vector<Tree *> parents)
-            : x("x"), y("y"), r("r"), g("g"), s("s"), t("t")
+            : Variable(new Tree(parent_symbol, "vec2", parent_type)),
+              x("x", this), y("y", this),
+              r("r", this), g("g", this),
+              s("s", this), t("t", this)
         {
-            this->tree = new Tree(parent_symbol, "vec2", parent_type);
             for (Tree *parent : parents)
                 this->tree->parents.push_back(parent);
-
-            x.set_origin(this->tree);
-            y.set_origin(this->tree);
-
-            r.set_origin(this->tree);
-            g.set_origin(this->tree);
-
-            s.set_origin(this->tree);
-            t.set_origin(this->tree);
         }
 
         Vec2(Float &f1, Float &f2)
-            : x("x"), y("y"), r("r"), g("g"), s("s"), t("t")
+            : Variable(new Tree("", "vec2", ParentType::Constructor)),
+              x("x", this), y("y", this),
+              r("r", this), g("g", this),
+              s("s", this), t("t", this)
         {
-            this->tree = new Tree("", "vec2", ParentType::Constructor);
             this->tree->parents.push_back(f1.tree);
             this->tree->parents.push_back(f2.tree);
 
             record(this->tree);
-
-            x.set_origin(this->tree);
-            y.set_origin(this->tree);
-
-            r.set_origin(this->tree);
-            g.set_origin(this->tree);
-
-            s.set_origin(this->tree);
-            t.set_origin(this->tree);
         }
 
         Vec2 &operator=(const Vec2 &other)

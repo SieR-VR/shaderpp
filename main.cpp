@@ -3,21 +3,18 @@
 #include "core/parser.h"
 #include "core/internal_functions.h"
 
-class MyStruct : public GLSL::Variable 
+class MyStruct : public GLSL::Variable
 {
 public:
     GLSL::Float fl;
     GLSL::Int in;
     GLSL::Vec2 vec;
 
-    MyStruct() : fl("fl"), in("in"), vec("vec") {
-        this->tree = new GLSL::Tree(Namer::next(), "MyStruct", GLSL::ParentType::Declaration);
-
+    MyStruct()
+        : Variable("MyStruct"),
+          fl("fl", this), in("in", this), vec("vec", this)
+    {
         GLSL::record(this->tree);
-
-        fl.set_origin(this->tree);
-        in.set_origin(this->tree);
-        vec.set_origin(this->tree);
     }
 };
 
@@ -32,7 +29,7 @@ int main(int argc, char *argv[])
         st.in = a1;
         st.fl = a2;
         st.vec = Vec2(a2, a2);
-
+        
         return st;
     };
     auto some_function = Parse(to_parse, "some_function");

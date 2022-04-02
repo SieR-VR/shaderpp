@@ -5,6 +5,8 @@
 #include <vector>
 #include <functional>
 
+#include "namer.h"
+
 namespace GLSL
 {
     enum class ParentType
@@ -64,9 +66,11 @@ namespace GLSL
         Tree *origin;
         std::vector<Tree *> branches;
 
-        Tree(std::string token, std::string glsl_type, ParentType parent_type = ParentType::None)
-            : token(token), glsl_type(glsl_type), parent_type(parent_type)
+        Tree(std::string token, std::string glsl_type, ParentType parent_type = ParentType::None, Tree *origin = nullptr)
+            : token(token), glsl_type(glsl_type), parent_type(parent_type), origin(origin)
         {
+            if (origin && parent_type == ParentType::Member)
+                origin->branches.push_back(this);
         }
 
         std::string get_declaration()
@@ -126,14 +130,18 @@ namespace GLSL
     public:
         Tree *tree;
 
-        void set_origin(Tree *origin) {
-            this->tree->origin = origin;
-            this->tree->parent_type = ParentType::Member;
-
-            origin->branches.push_back(this->tree);
+        Variable(Tree *tree)
+        {
+            this->tree = tree;
         }
 
-        std::string get_symbol() {
+        Variable(std::string glsl_type)
+        {
+            this->tree = new Tree(Namer::next(), glsl_type, ParentType::Declaration);
+        }
+
+        std::string get_symbol()
+        {
             return this->tree->get_expression();
         }
     };
@@ -170,8 +178,8 @@ namespace GLSL
             recorder.push_back("\t" + tree->get_expression() + " = " + tree->parents[0]->get_expression() + ";\n");
             break;
         case ParentType::Declaration:
-            recorder.push_back("\t" + tree->glsl_type + " " + tree->token + 
-                (tree->parents.size() ? " = " + tree->parents[0]->get_expression() : "") + ";\n");
+            recorder.push_back("\t" + tree->glsl_type + " " + tree->token +
+                               (tree->parents.size() ? " = " + tree->parents[0]->get_expression() : "") + ";\n");
             break;
         default:
             break;
@@ -182,7 +190,7 @@ namespace GLSL
     static std::string argument_declaration = "";
 
     template <typename T, typename A>
-    static T execute(std::function<T(A&)> func, A &arg)
+    static T execute(std::function<T(A &)> func, A &arg)
     {
         argument_declaration += arg.tree->get_declaration();
         return func(arg);

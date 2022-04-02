@@ -12,21 +12,25 @@ namespace GLSL
         Int() = delete;
 
         Int(std::string name, ParentType parent_type = ParentType::Argument)
+            : Variable(new Tree(name, "int", parent_type))
         {
-            this->tree = new Tree(name, "int", parent_type);
+        }
+
+        Int(std::string name, Variable *origin)
+            : Variable(new Tree(name, "int", ParentType::Member, origin->tree))
+        {
         }
 
         Int(Int &other)
+            : Variable(new Tree(Namer::next(), "int", ParentType::Declaration))
         {
-            this->tree = new Tree(Namer::next(), "int", ParentType::Declaration);
             this->tree->parents.push_back(other.tree);
-
             record(this->tree);
         }
 
         Int(std::string parent_symbol, ParentType parent_type, std::vector<Tree *> parents)
+            : Variable(new Tree(parent_symbol, "int", parent_type))
         {
-            this->tree = new Tree(parent_symbol, "int", parent_type);
             for (Tree *parent : parents)
                 this->tree->parents.push_back(parent);
         }
