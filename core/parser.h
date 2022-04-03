@@ -66,8 +66,8 @@ namespace GLSL
         Tree *origin;
         std::vector<Tree *> branches;
 
-        Tree(std::string token, std::string glsl_type, ParentType parent_type = ParentType::None, Tree *origin = nullptr)
-            : token(token), glsl_type(glsl_type), parent_type(parent_type), origin(origin)
+        Tree(std::string glsl_type, std::string token, ParentType parent_type = ParentType::None, Tree *origin = nullptr)
+            : glsl_type(glsl_type), token(token), parent_type(parent_type), origin(origin)
         {
             if (origin && parent_type == ParentType::Member)
                 origin->branches.push_back(this);
@@ -135,9 +135,9 @@ namespace GLSL
             this->tree = tree;
         }
 
-        Variable(std::string glsl_type)
+        Variable(std::string glsl_type, std::string token = Namer::next())
         {
-            this->tree = new Tree(Namer::next(), glsl_type, ParentType::Declaration);
+            this->tree = new Tree(glsl_type, token, ParentType::Declaration);
         }
 
         std::string get_symbol()

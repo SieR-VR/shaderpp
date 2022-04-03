@@ -16,7 +16,7 @@ namespace GLSL
         Vec2() = delete;
 
         Vec2(std::string symbol, ParentType parent_type = ParentType::Argument)
-            : Variable(new Tree(symbol, "vec2", ParentType::Argument)),
+            : Variable(new Tree("vec2", symbol, ParentType::Argument)),
               x("x", this), y("y", this),
               r("r", this), g("g", this),
               s("s", this), t("t", this)
@@ -24,7 +24,7 @@ namespace GLSL
         }
 
         Vec2(std::string symbol, Variable *origin)
-            : Variable(new Tree(symbol, "vec2", ParentType::Member, origin->tree)),
+            : Variable(new Tree("vec2", symbol, ParentType::Member, origin->tree)),
               x("x", this), y("y", this),
               r("r", this), g("g", this),
               s("s", this), t("t", this)
@@ -32,7 +32,7 @@ namespace GLSL
         }
 
         Vec2(Vec2 &other)
-            : Variable(new Tree(Namer::next(), "vec2", ParentType::Declaration)),
+            : Variable("vec2"),
               x("x", this), y("y", this),
               r("r", this), g("g", this),
               s("s", this), t("t", this)
@@ -41,7 +41,7 @@ namespace GLSL
         }
 
         Vec2(std::string parent_symbol, ParentType parent_type, std::vector<Tree *> parents)
-            : Variable(new Tree(parent_symbol, "vec2", parent_type)),
+            : Variable(new Tree("vec2", parent_symbol, parent_type)),
               x("x", this), y("y", this),
               r("r", this), g("g", this),
               s("s", this), t("t", this)
@@ -51,7 +51,7 @@ namespace GLSL
         }
 
         Vec2(Float &f1, Float &f2)
-            : Variable(new Tree("", "vec2", ParentType::Constructor)),
+            : Variable(new Tree("vec2", "", ParentType::Constructor)),
               x("x", this), y("y", this),
               r("r", this), g("g", this),
               s("s", this), t("t", this)
@@ -64,7 +64,7 @@ namespace GLSL
 
         Vec2 &operator=(const Vec2 &other)
         {
-            this->tree = new Tree(get_symbol(), "vec2", ParentType::AssignOperator);
+            this->tree = new Tree("vec2", get_symbol(), ParentType::AssignOperator);
             this->tree->parents.push_back(other.tree);
 
             record(this->tree);

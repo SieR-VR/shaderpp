@@ -12,24 +12,24 @@ namespace GLSL
         Float() = delete;
 
         Float(std::string name, ParentType parent_type = ParentType::Argument)
-            : Variable(new Tree(name, "float", parent_type))
+            : Variable(new Tree("float", name, parent_type))
         {
         }
 
         Float(std::string name, Variable *origin)
-            : Variable(new Tree(name, "float", ParentType::Member, origin->tree))
+            : Variable(new Tree("float", name, ParentType::Member, origin->tree))
         {
         }
 
         Float(Float &other)
-            : Variable(new Tree(Namer::next(), "float", ParentType::Declaration))
+            : Variable("float")
         {
             this->tree->parents.push_back(other.tree);
             record(this->tree);
         }
 
         Float(std::string parent_symbol, ParentType parent_type, std::vector<Tree *> parents)
-            : Variable(new Tree(parent_symbol, "float", parent_type))
+            : Variable(new Tree("float", parent_symbol, parent_type))
         {
             for (Tree *parent : parents)
                 this->tree->parents.push_back(parent);
@@ -37,7 +37,7 @@ namespace GLSL
 
         Float &operator=(Float &other)
         {
-            this->tree = new Tree(get_symbol(), "float", ParentType::AssignOperator);
+            this->tree = new Tree("float", get_symbol(), ParentType::AssignOperator);
             this->tree->parents.push_back(other.tree);
 
             record(this->tree);
