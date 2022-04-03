@@ -1,4 +1,6 @@
-# shaderpp
+Shaderpp is a GLSL(shader) code generator library for C++.
+
+It enables integrated development experiment for C++ and GLSL.
 
 # Table of Contents
 1. [Requirements](#requirements)
