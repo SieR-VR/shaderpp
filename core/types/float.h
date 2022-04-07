@@ -1,8 +1,7 @@
 #ifndef FLOAT_H_
 #define FLOAT_H_
 
-#include "../parser.h"
-#include "../namer.h"
+#include "../variable.h"
 
 namespace GLSL
 {
@@ -11,61 +10,55 @@ namespace GLSL
     public:
         Float() = delete;
 
-        Float(std::string name, ParentType parent_type = ParentType::Argument)
-            : Variable(new Tree("float", name, parent_type))
+        Float(std::string expression)
+            : Variable("float", expression)
         {
         }
 
-        Float(std::string name, Variable *origin)
-            : Variable(new Tree("float", name, ParentType::Member, origin->tree))
+        Float(std::string token, Variable *origin)
+            : Variable("float", token, origin)
         {
         }
 
         Float(Float &other)
             : Variable("float")
         {
-            this->tree->parents.push_back(other.tree);
-            record(this->tree);
-        }
-
-        Float(std::string parent_symbol, ParentType parent_type, std::vector<Tree *> parents)
-            : Variable(new Tree("float", parent_symbol, parent_type))
-        {
-            for (Tree *parent : parents)
-                this->tree->parents.push_back(parent);
+            Parser::record("float " + this->get_expression() + " = " + other.get_expression());
         }
 
         Float &operator=(Float &other)
         {
-            this->tree = new Tree("float", get_symbol(), ParentType::AssignOperator);
-            this->tree->parents.push_back(other.tree);
-
-            record(this->tree);
+            Parser::record(this->get_expression() + " = " + other.get_expression());
             return *this;
         }
 
         Float &operator+(Float &other)
         {
-            Float *result = new Float("+", ParentType::BinaryOperator, {this->tree, other.tree});
+            Float *result = new Float(get_binary_expression("+", this, &other));
             return *result;
         }
 
         Float &operator-(Float &other)
         {
-            Float *result = new Float("-", ParentType::BinaryOperator, {this->tree, other.tree});
+            Float *result = new Float(get_binary_expression("-", this, &other));
             return *result;
         }
 
         Float &operator*(Float &other)
         {
-            Float *result = new Float("*", ParentType::BinaryOperator, {this->tree, other.tree});
+            Float *result = new Float(get_binary_expression("*", this, &other));
             return *result;
         }
 
         Float &operator/(Float &other)
         {
-            Float *result = new Float("/", ParentType::BinaryOperator, {this->tree, other.tree});
+            Float *result = new Float(get_binary_expression("/", this, &other));
             return *result;
+        }
+
+        static std::string get_type()
+        {
+            return "float";
         }
     };
 }

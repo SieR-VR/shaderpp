@@ -12,7 +12,7 @@ int main() {
         return a1;
     };
 
-    auto some_function = Parse(func, "some_function");
+    auto some_function = Parser::Parse(func, "some_function");
 
     if (!ASSERT_EQUAL(some_function.declaration, "float some_function(int a0, float a1);\n")) {
         std::cerr << "Expected declaration: " << "float some_function(int a0, float a1);\n"

@@ -1,6 +1,8 @@
 #include <iostream>
 
-#include "core/parser.h"
+#include "core/variable.h"
+#include "core/struct.h"
+
 #include "core/internal_functions.h"
 
 class MyStruct : public GLSL::Variable
@@ -14,7 +16,6 @@ public:
         : Variable("MyStruct"),
           fl("fl", this), in("in", this), vec("vec", this)
     {
-        GLSL::record(this->tree);
     }
 };
 
@@ -32,7 +33,9 @@ int main(int argc, char *argv[])
         
         return st;
     };
-    auto some_function = Parse(to_parse, "some_function");
+    auto some_function = Parser::Parse(to_parse, "some_function");
+
+    std::vector<int> t;
 
     std::cout << mystruct.declaration
               << mystruct.definition

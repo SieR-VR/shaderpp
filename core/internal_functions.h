@@ -11,19 +11,19 @@ namespace GLSL
 {
     Float &sin(Float &a)
     {
-        Float *result = new Float("sin", ParentType::Function, {a.tree});
+        Float *result = new Float("sin(" + a.get_expression() + ")"); 
         return *result;
     }
 
     Float &cos(Float &a)
     {
-        Float *result = new Float("cos", ParentType::Function, {a.tree});
+        Float *result = new Float("cos" + a.get_expression() + ")");
         return *result;
     }
 
     Float &tan(Float &a)
     {
-        Float *result = new Float("tan", ParentType::Function, {a.tree});
+        Float *result = new Float("tan"  + a.get_expression() + ")");
         return *result;
     }
 }

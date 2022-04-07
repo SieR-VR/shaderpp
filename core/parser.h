@@ -6,235 +6,71 @@
 #include <functional>
 
 #include "namer.h"
+#include "function.h"
 
 namespace GLSL
 {
-    enum class ParentType
+    namespace Parser
     {
-        None = 0,
-        Argument,
-        Member,
-        Function,
-        UnaryOperator,
-        BinaryOperator,
-        AssignOperator,
-        Declaration,
-        Constructor,
-    };
+        static std::vector<std::string> recorder;
 
-    class Tree;
-    class Variable;
+        static int arg_index = 0;
+        static std::string argument_declaration = "";
 
-    template <typename T, typename... Args>
-    class Function
-    {
-    public:
-        std::string declaration;
-        std::string definition;
-        std::string symbol;
-
-        Function(std::string symbol) : symbol(symbol) {}
-
-        std::vector<Tree *> unwrap_others()
+        static void record(std::string s)
         {
-            return std::vector<Tree *>();
+            recorder.push_back("\t" + s + ";\n");
         }
 
-        template <typename U, typename... Args_>
-        std::vector<Tree *> unwrap_others(U &u, Args_ &...others)
+        template <typename T, typename A>
+        static T execute(std::function<T(A &)> func, A &arg)
         {
-            std::vector<Tree *> unwraped = unwrap_others(others...);
-            unwraped.insert(unwraped.begin(), u.tree);
-
-            return unwraped;
+            argument_declaration += arg.get_declaration();
+            return func(arg);
         }
 
-        T &operator()(Args &...others)
+        template <typename T, typename A1, typename A2, typename... Args>
+        static T execute(std::function<T(A1 &, A2 &, Args &...)> func, A1 &a1)
         {
-            return *(new T(symbol, ParentType::Function, unwrap_others(others...)));
-        }
-    };
+            argument_declaration += a1.get_declaration() + ", ";
 
-    class Tree
-    {
-    public:
-        std::vector<Tree *> parents;
-        std::string token;
-        std::string glsl_type;
-        ParentType parent_type;
-
-        Tree *origin;
-        std::vector<Tree *> branches;
-
-        Tree(std::string glsl_type, std::string token, ParentType parent_type = ParentType::None, Tree *origin = nullptr)
-            : glsl_type(glsl_type), token(token), parent_type(parent_type), origin(origin)
-        {
-            if (origin && parent_type == ParentType::Member)
-                origin->branches.push_back(this);
-        }
-
-        std::string get_declaration()
-        {
-            return glsl_type + " " + token;
-        }
-
-        std::string get_expression()
-        {
-            switch (parent_type)
+            std::function<T(A2 &, Args & ...)> bound = [&](A2 &a2, Args &...others) -> T
             {
-            case ParentType::None:
-            case ParentType::Argument:
-            case ParentType::AssignOperator:
-            case ParentType::Declaration:
-                return token;
-            case ParentType::Member:
-            {
-                return origin->get_expression() + "." + token;
-            }
-            case ParentType::Function:
-            {
-                std::string expression = token + "(";
-                for (int i = 0; i < parents.size(); i++)
-                {
-                    expression += parents[i]->get_expression();
-                    if (i != parents.size() - 1)
-                        expression += ", ";
-                }
-                expression += ")";
-                return expression;
-            }
-            case ParentType::UnaryOperator:
-                return "(" + token + parents[0]->get_expression() + ")";
-            case ParentType::BinaryOperator:
-                return "(" + parents[0]->get_expression() + " " + token + " " + parents[1]->get_expression() + ")";
-            case ParentType::Constructor:
-            {
-                std::string expression = glsl_type + "(";
-                for (int i = 0; i < parents.size(); i++)
-                {
-                    expression += parents[i]->get_expression();
-                    if (i != parents.size() - 1)
-                        expression += ", ";
-                }
-                expression += ")";
-                return expression;
-            }
-            default:
-                return "";
-            }
-        }
-    };
+                return func(a1, a2, others...);
+            };
 
-    class Variable
-    {
-    public:
-        Tree *tree;
-
-        Variable(Tree *tree)
-        {
-            this->tree = tree;
+            A2 a2(Namer::name("arg_", arg_index++, A2::get_type(), ""));
+            return execute(bound, a2);
         }
 
-        Variable(std::string glsl_type, std::string token = Namer::next())
+        template <typename T, typename A, typename... Args>
+        static Function<T, A, Args...> Parse(std::function<T(A &, Args &...)> func, std::string func_name)
         {
-            this->tree = new Tree(glsl_type, token, ParentType::Declaration);
-        }
+            recorder.clear();
+            arg_index = 0;
+            argument_declaration = "";
 
-        std::string get_symbol()
-        {
-            return this->tree->get_expression();
-        }
-    };
+            A a(Namer::name("arg_", arg_index++, A::get_type(), ""));
+            T t = execute<T, A, Args...>(func, a);
 
-    template <typename T>
-    class Struct
-    {
-    public:
-        std::string declaration;
-        std::string definition;
-        std::string symbol;
+            Function<T, A, Args...> function(func_name);
 
-        Struct()
-        {
-            T *t = new T();
+            std::string header = t.glsl_type + " " + func_name + "(" + argument_declaration + ")";
+            std::string footer = "}\n";
 
-            this->symbol = t->tree->glsl_type;
-            this->declaration = "struct " + this->symbol + ";\n";
-            this->definition = "struct " + this->symbol + " {\n";
+            function.definition = header + " {\n";
+            for (std::string line : recorder)
+                function.definition += line;
+            function.definition += "\treturn " + t.get_expression() + ";\n";
+            function.definition += footer;
 
-            for (Tree *tree : t->tree->branches)
-                this->definition += "\t" + tree->get_declaration() + ";\n";
+            function.declaration = header + ";\n";
 
-            this->definition += "};\n";
-        }
-    };
-
-    static std::vector<std::string> recorder;
-    static void record(Tree *tree)
-    {
-        switch (tree->parent_type)
-        {
-        case ParentType::AssignOperator:
-            recorder.push_back("\t" + tree->get_expression() + " = " + tree->parents[0]->get_expression() + ";\n");
-            break;
-        case ParentType::Declaration:
-            recorder.push_back("\t" + tree->glsl_type + " " + tree->token +
-                               (tree->parents.size() ? " = " + tree->parents[0]->get_expression() : "") + ";\n");
-            break;
-        default:
-            break;
+            return function;
         }
     }
 
-    static int arg_index = 0;
-    static std::string argument_declaration = "";
-
-    template <typename T, typename A>
-    static T execute(std::function<T(A &)> func, A &arg)
-    {
-        argument_declaration += arg.tree->get_declaration();
-        return func(arg);
-    }
-
-    template <typename T, typename A1, typename A2, typename... Args>
-    static T execute(std::function<T(A1 &, A2 &, Args &...)> func, A1 &a1)
-    {
-        argument_declaration += a1.tree->get_declaration() + ", ";
-
-        std::function<T(A2 &, Args & ...)> bound = [&](A2 &a2, Args &...others) -> T
-        {
-            return func(a1, a2, others...);
-        };
-
-        A2 a2("a" + std::to_string(arg_index++));
-        return execute(bound, a2);
-    }
-
-    template <typename T, typename A, typename... Args>
-    static Function<T, A, Args...> Parse(std::function<T(A &, Args &...)> func, std::string func_name)
-    {
-        recorder.clear();
-        arg_index = 0;
-        argument_declaration = "";
-
-        A a("a" + std::to_string(arg_index++));
-        T t = execute<T, A, Args...>(func, a);
-
-        Function<T, A, Args...> function(func_name);
-
-        std::string header = t.tree->glsl_type + " " + func_name + "(" + argument_declaration + ")";
-        std::string footer = "}\n";
-
-        function.definition = header + " {\n";
-        for (std::string line : recorder)
-            function.definition += line;
-        function.definition += "\treturn " + t.tree->get_expression() + ";\n";
-        function.definition += footer;
-
-        function.declaration = header + ";\n";
-
-        return function;
-    }
+    
 } // namespace GLSL
 
 #endif
