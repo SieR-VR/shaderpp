@@ -15,7 +15,7 @@ namespace GLSL
         {
         }
 
-        Int(std::string name, std::shared_ptr<Variable> origin)
+        Int(std::string name, Variable *origin)
             : Variable("int", name, origin)
         {
         }

@@ -3,20 +3,19 @@
 
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "parser.h"
 
 namespace GLSL
 {
-    class Variable : std::enable_shared_from_this<Variable>
+    class Variable
     {
     public:
         std::string expression;
         std::string glsl_type;
 
-        std::vector<std::shared_ptr<Variable>> branches;
-        std::shared_ptr<Variable> origin;
+        std::vector<Variable *> branches;
+        Variable *origin = nullptr;
 
         Variable(std::string glsl_type) 
             : glsl_type(glsl_type), 
@@ -30,19 +29,19 @@ namespace GLSL
         {
         }
 
-        Variable(std::string glsl_type, std::string token, std::shared_ptr<Variable>& origin)
+        Variable(std::string glsl_type, std::string token, Variable *origin)
             : glsl_type(glsl_type), expression(token), origin(origin)
         {
             if (origin)
-                origin->branches.push_back(This());
+                origin->branches.push_back(this);
         }
 
-        static std::string get_binary_expression(std::string token, const Variable& left, const Variable& right)
+        static std::string get_binary_expression(std::string token, Variable *left, Variable *right)
         {
-            return "(" + left.get_expression() + " " + token + " " + right.get_expression() + ")";
+            return "(" + left->get_expression() + " " + token + " " + right->get_expression() + ")";
         }
 
-        std::string get_declaration() const
+        std::string get_declaration()
         {
             return glsl_type + " " + expression;
         }
@@ -53,11 +52,6 @@ namespace GLSL
                 return origin->get_expression() + "." + expression;
             else
                 return expression;
-        }
-
-        std::shared_ptr<Variable> This()
-        {
-            return shared_from_this();
         }
     };
 }

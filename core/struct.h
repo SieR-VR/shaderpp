@@ -25,7 +25,7 @@ namespace GLSL
 
         StructDecl()
         {
-            std::shared_ptr<T> t = std::make_shared<T>();
+            T *t = new T();
             glsl_type = t->glsl_type;
 
             declaration = "struct " + glsl_type + ";\n";

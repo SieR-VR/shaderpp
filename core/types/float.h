@@ -15,7 +15,7 @@ namespace GLSL
         {
         }
 
-        Float(std::string token, std::shared_ptr<Variable> origin)
+        Float(std::string token, Variable *origin)
             : Variable("float", token, origin)
         {
         }
@@ -34,25 +34,25 @@ namespace GLSL
 
         Float &operator+(Float &other)
         {
-            Float *result = new Float(get_binary_expression("+", *this, other));
+            Float *result = new Float(get_binary_expression("+", this, &other));
             return *result;
         }
 
         Float &operator-(Float &other)
         {
-            Float *result = new Float(get_binary_expression("-", *this, other));
+            Float *result = new Float(get_binary_expression("-", this, &other));
             return *result;
         }
 
         Float &operator*(Float &other)
         {
-            Float *result = new Float(get_binary_expression("*", *this, other));
+            Float *result = new Float(get_binary_expression("*", this, &other));
             return *result;
         }
 
         Float &operator/(Float &other)
         {
-            Float *result = new Float(get_binary_expression("/", *this, other));
+            Float *result = new Float(get_binary_expression("/", this, &other));
             return *result;
         }
 
