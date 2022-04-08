@@ -14,7 +14,7 @@ public:
 
     MyStruct()
         : Struct("MyStruct"),
-          fl("fl", this), in("in", this), vec("vec", this)
+          fl("fl", This()), in("in", This()), vec("vec", This())
     {
     }
 };
