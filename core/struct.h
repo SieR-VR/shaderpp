@@ -5,26 +5,35 @@
 
 namespace GLSL
 {
-    template <typename T>
-    class Struct
+    class Struct : public Variable
     {
     public:
+        Struct(const std::string &glsl_type) 
+            : Variable(glsl_type, Namer::name("va_", Parser::recorder.size(), glsl_type, ""))
+        {
+            Parser::record(glsl_type + " " + this->get_expression()); 
+        }
+    };
+
+    template <class T>
+    class StructDecl 
+    {
+    public:
+        std::string glsl_type;
         std::string declaration;
         std::string definition;
-        std::string symbol;
 
-        Struct()
+        StructDecl()
         {
             T *t = new T();
+            glsl_type = t->glsl_type;
 
-            this->symbol = t->glsl_type;
-            this->declaration = "struct " + this->symbol + ";\n";
-            this->definition = "struct " + this->symbol + " {\n";
+            declaration = "struct " + glsl_type + ";\n";
 
-            for (Variable *v : t->branches)
-                this->definition += "\t" + v->get_declaration() + ";\n";
-
-            this->definition += "};\n";
+            definition = "struct " + glsl_type + " {\n";
+            for (auto branch : t->branches)
+                definition += "\t" + branch->glsl_type + " " + branch->expression + ";\n";
+            definition += "};\n";
         }
     };
 }

@@ -21,7 +21,7 @@ namespace GLSL
             : glsl_type(glsl_type), 
               expression(Namer::name("va_", Parser::recorder.size(), glsl_type, ""))
         {
-            Parser::record(glsl_type + " " + expression);
+            
         }
 
         Variable(std::string glsl_type, std::string expression)

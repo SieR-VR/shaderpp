@@ -5,7 +5,7 @@
 
 #include "core/internal_functions.h"
 
-class MyStruct : public GLSL::Variable
+class MyStruct : public GLSL::Struct
 {
 public:
     GLSL::Float fl;
@@ -13,7 +13,7 @@ public:
     GLSL::Vec2 vec;
 
     MyStruct()
-        : Variable("MyStruct"),
+        : Struct("MyStruct"),
           fl("fl", this), in("in", this), vec("vec", this)
     {
     }
@@ -22,7 +22,7 @@ public:
 int main(int argc, char *argv[])
 {
     using namespace GLSL;
-    Struct<MyStruct> mystruct;
+    StructDecl<MyStruct> myStruct;
 
     std::function<MyStruct(Int &, Float &)> to_parse = [](Int &a1, Float &a2)
     {
@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
 
     std::vector<int> t;
 
-    std::cout << mystruct.declaration
-              << mystruct.definition
+    std::cout << myStruct.declaration
+              << myStruct.definition
               << std::endl
               << some_function.declaration
               << some_function.definition;
