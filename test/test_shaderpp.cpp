@@ -12,7 +12,7 @@ int main() {
         return a1;
     };
 
-    auto some_function = Parser::Parse(func, "some_function");
+    auto some_function = Parser::parse(func, "some_function");
 
     RegexBuilder arguments_regex;
     arguments_regex.string("arg_")

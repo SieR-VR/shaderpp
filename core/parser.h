@@ -44,7 +44,7 @@ namespace GLSL
         }
 
         template <typename T, typename A, typename... Args>
-        static Function<T, A, Args...> Parse(std::function<T(A &, Args &...)> func, std::string func_name)
+        static Function<T, A, Args...> parse(std::function<T(A &, Args &...)> func, std::string func_name)
         {
             recorder.clear();
             arg_index = 0;
@@ -67,6 +67,26 @@ namespace GLSL
             function.declaration = header + ";\n";
 
             return function;
+        }
+        
+        static std::string parse_main(std::function<void()> func)
+        {
+            recorder.clear();
+            arg_index = 0;
+            argument_declaration = "";
+
+            func();
+
+            std::string definition = "";
+            std::string header = "void main()";
+            std::string footer = "}\n";
+
+            definition = header + " {\n";
+            for (std::string line : recorder)
+                definition += line;
+            definition += footer;
+
+            return definition;
         }
     }
 

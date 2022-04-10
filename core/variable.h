@@ -36,12 +36,17 @@ namespace GLSL
                 origin->branches.push_back(this);
         }
 
-        static std::string get_binary_expression(std::string token, Variable *left, Variable *right)
+        static std::string bin_exp(std::string token, Variable *left, Variable *right)
         {
             return "(" + left->get_expression() + " " + token + " " + right->get_expression() + ")";
         }
 
-        std::string get_declaration()
+        static std::string un_exp(std::string token, Variable *right)
+        {
+            return "(" + token + right->get_expression() + ")";
+        }
+
+        std::string get_declaration() const
         {
             return glsl_type + " " + expression;
         }

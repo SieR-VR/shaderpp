@@ -26,6 +26,11 @@ namespace GLSL
             Parser::record("float " + this->get_expression() + " = " + other.get_expression());
         }
 
+        Float(float value)
+            : Variable("float", std::to_string(value))
+        {
+        }
+
         Float &operator=(Float &other)
         {
             Parser::record(this->get_expression() + " = " + other.get_expression());
@@ -34,25 +39,25 @@ namespace GLSL
 
         Float &operator+(Float &other)
         {
-            Float *result = new Float(get_binary_expression("+", this, &other));
+            Float *result = new Float(bin_exp("+", this, &other));
             return *result;
         }
 
         Float &operator-(Float &other)
         {
-            Float *result = new Float(get_binary_expression("-", this, &other));
+            Float *result = new Float(bin_exp("-", this, &other));
             return *result;
         }
 
         Float &operator*(Float &other)
         {
-            Float *result = new Float(get_binary_expression("*", this, &other));
+            Float *result = new Float(bin_exp("*", this, &other));
             return *result;
         }
 
         Float &operator/(Float &other)
         {
-            Float *result = new Float(get_binary_expression("/", this, &other));
+            Float *result = new Float(bin_exp("/", this, &other));
             return *result;
         }
 

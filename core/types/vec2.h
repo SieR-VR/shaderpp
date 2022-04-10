@@ -36,7 +36,7 @@ namespace GLSL
               r("r", this), g("g", this),
               s("s", this), t("t", this)
         {
-            Parser::record("vec2" + this->get_expression() + " = " + other.get_expression());
+            Parser::record("vec2 " + this->get_expression() + " = " + other.get_expression());
         }
 
         Vec2(Float &f1, Float &f2)
@@ -55,37 +55,37 @@ namespace GLSL
 
         Vec2 &operator+(Vec2 &other)
         {
-            Vec2 *result = new Vec2(get_binary_expression("+", this, &other));
+            Vec2 *result = new Vec2(bin_exp("+", this, &other));
             return *result;
         }
 
         Vec2 &operator-(Vec2 &other) 
         {
-            Vec2 *result = new Vec2(get_binary_expression("-", this, &other));
+            Vec2 *result = new Vec2(bin_exp("-", this, &other));
             return *result;
         }
 
         Vec2 &operator*(Vec2 &other) 
         {
-            Vec2 *result = new Vec2(get_binary_expression("*", this, &other));
+            Vec2 *result = new Vec2(bin_exp("*", this, &other));
             return *result;
         }
 
         Vec2 &operator/(Vec2 &other) 
         {
-            Vec2 *result = new Vec2(get_binary_expression("/", this, &other));
+            Vec2 *result = new Vec2(bin_exp("/", this, &other));
             return *result;
         }
 
         Vec2 &operator*(Float &other) 
         {
-            Vec2 *result = new Vec2(get_binary_expression("*", this, &other));
+            Vec2 *result = new Vec2(bin_exp("*", this, &other));
             return *result;
         }
 
         Vec2 &operator/(Float &other) 
         {
-            Vec2 *result = new Vec2(get_binary_expression("/", this, &other));
+            Vec2 *result = new Vec2(bin_exp("/", this, &other));
             return *result;
         }
 

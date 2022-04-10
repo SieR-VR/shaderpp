@@ -33,7 +33,7 @@ namespace GLSL
     public:
         T &operator()(Args &...others)
         {
-            return *(new T(symbol, unwrap_others(others...)));
+            return *(new T(symbol + "(" + unwrap_others(others...) + ")"));
         }
     };
 }
