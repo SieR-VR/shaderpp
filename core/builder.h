@@ -17,6 +17,11 @@ namespace GLSL
         {
         }
 
+        Builder(const std::string &version, const std::string &profile)
+            : glsl_version("#version " + version + " " + profile + "\n")
+        {
+        }
+
         Builder &add_outputs(const std::vector<Variable> &outputs)
         {
             for (const auto &output : outputs)
@@ -54,7 +59,7 @@ namespace GLSL
             return *this;
         }
 
-        std::string build(std::function<void()> main_func)
+        std::string build()
         {
             std::string result = glsl_version;
             result += "\n";
@@ -94,7 +99,7 @@ namespace GLSL
             if (function_impls.size())
                 result += "\n";
 
-            result += Parser::parse_main(main_func);
+            result += Parser::parse_main();
             return result;
         }
 

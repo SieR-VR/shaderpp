@@ -5,22 +5,39 @@
 #include "core/struct.h"
 
 #include "core/internal_functions.h"
-#include "core/builder.h"
+#include "core/program.h"
+#include "core/uniform.h"
 
-int main(int argc, char *argv[])
+#include <GLFW/glfw3.h>
+
+class Phong : public GLSL::Shader
 {
-    using namespace GLSL;
-    Vec4 FragColor("FragColor");
+    GLSL::Output<GLSL::Vec4> FragColor;
 
-    Vec3 Normal("Normal");
-    Vec3 FragPos("FragPos");
+    GLSL::Input<GLSL::Vec3> Normal;
+    GLSL::Input<GLSL::Vec3> FragPos;
 
-    Vec3 lightPos("lightPos");
-    Vec3 viewPos("viewPos");
-    Vec3 lightColor("lightColor");
-    Vec3 objectColor("objectColor");
+public:
+    GLSL::Uniform<GLSL::Vec3> lightPos;
+    GLSL::Uniform<GLSL::Vec3> viewPos;
+    GLSL::Uniform<GLSL::Vec3> lightColor;
+    GLSL::Uniform<GLSL::Vec3> objectColor;
 
-    std::function<void()> main_func = [&]() {
+    Phong()
+        : GLSL::Shader("300", "es", GL_FRAGMENT_SHADER),
+          FragColor("FragColor", this),
+          Normal("Normal", this),
+          FragPos("FragPos", this),
+          lightPos("lightPos", this),
+          viewPos("viewPos", this),
+          lightColor("lightColor", this),
+          objectColor("objectColor", this)
+    {
+    }
+
+    void main() {
+        using namespace GLSL;
+
         Float ambientStrength = 0.1;
         Vec3 ambient = lightColor * ambientStrength;
 
@@ -38,16 +55,33 @@ int main(int argc, char *argv[])
 
         Vec3 result = (ambient + diffuse + specular) * objectColor;
         FragColor = Vec4(result.x, result.y, result.z, 1);
-    };
+    }
+};
 
-    auto result = GLSL::Builder("460")
-        .add_outputs({ FragColor })
-        .add_inputs({ Normal, FragPos })
-        .add_uniforms({ lightPos, viewPos, lightColor, objectColor })
-        .build(main_func);
+int main(int argc, char *argv[])
+{
+    GLFWwindow *window;
+    if (!glfwInit())
+        return -1;
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 
-    std::ofstream out("../sample.frag");
-    out << result;
+    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        return -1;
+    }
+
+    glfwMakeContextCurrent(window);
+    glewInit();
+
+    Phong shader;
+    shader.compile();
+    
+    std::cout << shader.source;
+
 
     return 0;
 }
