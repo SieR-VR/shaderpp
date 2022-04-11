@@ -81,7 +81,5 @@ int main(int argc, char *argv[])
     shader.compile();
     
     std::cout << shader.source;
-
-
     return 0;
 }

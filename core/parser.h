@@ -10,12 +10,13 @@
 
 namespace GLSL
 {
-    namespace Parser
+    class Parser
     {
-        static std::vector<std::string> recorder;
+    public:
+        inline static std::vector<std::string> recorder;
 
-        static int arg_index = 0;
-        static std::string argument_declaration = "";
+        inline static int arg_index = 0;
+        inline static std::string argument_declaration = "";
 
         /**
          * @brief The function records the function line
@@ -115,7 +116,7 @@ namespace GLSL
 
             return definition;
         }
-    }
+    };
 
     
 } // namespace GLSL

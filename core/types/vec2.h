@@ -16,34 +16,34 @@ namespace GLSL
 
         Vec2(std::string symbol)
             : Variable("vec2", symbol),
-              x("x", this), y("y", this),
-              r("r", this), g("g", this),
-              s("s", this), t("t", this)
+              x("x", This()), y("y", This()),
+              r("r", This()), g("g", This()),
+              s("s", This()), t("t", This())
         {
         }
 
-        Vec2(std::string symbol, Variable *origin)
+        Vec2(std::string symbol, std::weak_ptr<Variable> origin)
             : Variable("vec2", symbol, origin),
-              x("x", this), y("y", this),
-              r("r", this), g("g", this),
-              s("s", this), t("t", this)
+              x("x", This()), y("y", This()),
+              r("r", This()), g("g", This()),
+              s("s", This()), t("t", This())
         {
         }
 
-        Vec2(Vec2 &other)
+        Vec2(const Vec2 &other)
             : Variable("vec2"),
-              x("x", this), y("y", this),
-              r("r", this), g("g", this),
-              s("s", this), t("t", this)
+              x("x", This()), y("y", This()),
+              r("r", This()), g("g", This()),
+              s("s", This()), t("t", This())
         {
             Parser::record("vec2 " + this->get_expression() + " = " + other.get_expression());
         }
 
-        Vec2(Float &f1, Float &f2)
+        Vec2(const Float &f1, const Float &f2)
             : Variable("vec2", "vec2(" + f1.get_expression() + ", " + f2.get_expression() + ")"),
-              x("x", this), y("y", this),
-              r("r", this), g("g", this),
-              s("s", this), t("t", this)
+              x("x", This()), y("y", This()),
+              r("r", This()), g("g", This()),
+              s("s", This()), t("t", This())
         {
         }
 

@@ -15,12 +15,12 @@ namespace GLSL
         {
         }
 
-        Float(std::string token, Variable *origin)
+        Float(std::string token, std::weak_ptr<Variable> origin)
             : Variable("float", token, origin)
         {
         }
 
-        Float(Float &other)
+        Float(const Float &other)
             : Variable("float")
         {
             Parser::record("float " + this->get_expression() + " = " + other.get_expression());

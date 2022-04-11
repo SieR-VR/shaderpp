@@ -15,18 +15,18 @@ namespace GLSL
         {
         }
 
-        Int(std::string name, Variable *origin)
+        Int(std::string name, std::weak_ptr<Variable> origin)
             : Variable("int", name, origin)
         {
         }
 
-        Int(Int &other)
+        Int(const Int &other)
             : Variable("int")
         {
             Parser::record("int" + this->get_expression() + " = " + other.get_expression());
         }
 
-        Int &operator=(Int &other)
+        Int &operator=(const Int &other)
         {
             Parser::record(this->get_expression() + " = " + other.get_expression());
             return *this;

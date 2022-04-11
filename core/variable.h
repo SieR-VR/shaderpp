@@ -3,25 +3,25 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "parser.h"
 
 namespace GLSL
 {
-    class Variable
+    class Variable : std::enable_shared_from_this<Variable>
     {
     public:
         std::string expression;
         std::string glsl_type;
 
-        std::vector<Variable *> branches;
-        Variable *origin = nullptr;
+        std::vector<std::shared_ptr<Variable>> branches;
+        std::weak_ptr<Variable> origin;
 
         Variable(std::string glsl_type) 
             : glsl_type(glsl_type), 
               expression(Namer::name("va_", Parser::recorder.size(), glsl_type, ""))
         {
-            
         }
 
         Variable(std::string glsl_type, std::string expression)
@@ -29,11 +29,11 @@ namespace GLSL
         {
         }
 
-        Variable(std::string glsl_type, std::string token, Variable *origin)
+        Variable(std::string glsl_type, std::string token, std::weak_ptr<Variable> origin)
             : glsl_type(glsl_type), expression(token), origin(origin)
         {
-            if (origin)
-                origin->branches.push_back(this);
+            if (origin.lock())
+                origin.lock()->branches.push_back(shared_from_this());
         }
 
         static std::string bin_exp(std::string token, Variable *left, Variable *right)
@@ -53,10 +53,15 @@ namespace GLSL
 
         std::string get_expression() const
         {
-            if (origin)
-                return origin->get_expression() + "." + expression;
+            if (origin.lock())
+                return origin.lock()->get_expression() + "." + expression;
             else
                 return expression;
+        }
+
+        std::weak_ptr<Variable> This()
+        {
+            return weak_from_this();
         }
     };
 }

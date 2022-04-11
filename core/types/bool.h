@@ -15,18 +15,18 @@ namespace GLSL
         {
         }
 
-        Bool(std::string token, Variable *origin)
+        Bool(std::string token, std::weak_ptr<Variable> origin)
             : Variable("bool", token, origin)
         {
         }
 
-        Bool(Bool &other)
+        Bool(const Bool &other)
             : Variable("bool")
         {
             Parser::record("bool" + this->get_expression() + " = " + other.get_expression());
         }
 
-        Bool &operator=(Bool &other)
+        Bool &operator=(const Bool &other)
         {
             Parser::record(this->get_expression() + " = " + other.get_expression());
             return *this;
@@ -38,13 +38,13 @@ namespace GLSL
             return *result;
         }
 
-        Bool &operator&&(Bool &other)
+        Bool &operator&&(const Bool &other)
         {
             Bool *result = new Bool("(" + this->get_expression() + " && " + other.get_expression() + ")");
             return *result;
         }
 
-        Bool &operator||(Bool &other)
+        Bool &operator||(const Bool &other)
         {
             Bool *result = new Bool("(" + this->get_expression() + " || " + other.get_expression() + ")");
             return *result;

@@ -12,19 +12,19 @@
 
 namespace GLSL
 {
-    Float &sin(Float &a)
+    Float &sin(const Float &a)
     {
         Float *result = new Float("sin(" + a.get_expression() + ")"); 
         return *result;
     }
 
-    Float &cos(Float &a)
+    Float &cos(const Float &a)
     {
         Float *result = new Float("cos(" + a.get_expression() + ")");
         return *result;
     }
 
-    Float &tan(Float &a)
+    Float &tan(const Float &a)
     {
         Float *result = new Float("tan("  + a.get_expression() + ")");
         return *result;
@@ -42,31 +42,31 @@ namespace GLSL
         return *result;
     }
 
-    Float &dot(Vec2 &a, Vec2 &b)
+    Float &dot(const Vec2 &a, const Vec2 &b)
     {
         Float *result = new Float("dot(" + a.get_expression() + ", " + b.get_expression() + ")");
         return *result;
     }
 
-    Float &dot(Vec3 &a, Vec3 &b)
+    Float &dot(const Vec3 &a, const Vec3 &b)
     {
         Float *result = new Float("dot(" + a.get_expression() + ", " + b.get_expression() + ")");
         return *result;
     }
 
-    Vec2 &normalize(Vec2 &a)
+    Vec2 &normalize(const Vec2 &a)
     {
         Vec2 *result = new Vec2("normalize(" + a.get_expression() + ")");
         return *result;
     }
 
-    Vec3 &normalize(Vec3 &a)
+    Vec3 &normalize(const Vec3 &a)
     {
         Vec3 *result = new Vec3("normalize(" + a.get_expression() + ")");
         return *result;
     }
 
-    Vec3 &reflect(Vec3 &a, Vec3 &b)
+    Vec3 &reflect(const Vec3 &a, const Vec3 &b)
     {
         Vec3 *result = new Vec3("reflect(" + a.get_expression() + ", " + b.get_expression() + ")");
         return *result;

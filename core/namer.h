@@ -9,7 +9,7 @@
 class Namer
 {
 public:
-    static std::string name(std::string prefix, int line, std::string type, std::string nonce) {
+    static std::string name(const std::string& prefix, const int& line, const std::string& type, const std::string& nonce) {
         static std::hash<std::string> hash_fn;
 
         std::stringstream stream;
