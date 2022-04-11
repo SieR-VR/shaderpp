@@ -17,11 +17,21 @@ namespace GLSL
         static int arg_index = 0;
         static std::string argument_declaration = "";
 
+        /**
+         * @brief The function records the function line
+         */
         static void record(std::string s)
         {
             recorder.push_back("\t" + s + ";\n");
         }
 
+        /**
+         * @brief The helper function executes the function
+         * @tparam T The return type of the function
+         * @tparam A The last argument type of the function
+         * @param func The function to be executed
+         * @param arg The last argument of the function
+         */
         template <typename T, typename A>
         static T execute(std::function<T(A &)> func, A &arg)
         {
@@ -29,20 +39,37 @@ namespace GLSL
             return func(arg);
         }
 
+        /**
+         * @brief The helper function executes the function
+         * @tparam T The return type of the function
+         * @tparam A1 The first argument type of the function
+         * @tparam A2 The second argument type of the function
+         * @tparam ...Args The rest of the argument types of the function
+         * @param func The function to be executed
+         * @param arg The last argument of the function
+         */
         template <typename T, typename A1, typename A2, typename... Args>
-        static T execute(std::function<T(A1 &, A2 &, Args &...)> func, A1 &a1)
+        static T execute(std::function<T(A1 &, A2 &, Args &...)> func, A1 &arg)
         {
-            argument_declaration += a1.get_declaration() + ", ";
+            argument_declaration += arg.get_declaration() + ", ";
 
             std::function<T(A2 &, Args & ...)> bound = [&](A2 &a2, Args &...others) -> T
             {
-                return func(a1, a2, others...);
+                return func(arg, a2, others...);
             };
 
             A2 a2(Namer::name("arg_", arg_index++, A2::get_type(), ""));
             return execute(bound, a2);
         }
 
+        /**
+         * @brief The main function of the parser
+         * @tparam T The return type of the function
+         * @tparam ...Args Argument types of the function
+         * @param func The function to be executed
+         * @param func_name The name of the function
+         * @return Function<T, Args> The function object
+         */
         template <typename T, typename A, typename... Args>
         static Function<T, A, Args...> parse(std::function<T(A &, Args &...)> func, std::string func_name)
         {
@@ -69,6 +96,11 @@ namespace GLSL
             return function;
         }
         
+        /**
+         * @brief Another main function of the parser, this one is for glsl main function
+         * @param func The function to be executed
+         * @return std::string The function definition
+         */
         static std::string parse_main(std::function<void()> func)
         {
             recorder.clear();

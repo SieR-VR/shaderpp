@@ -5,6 +5,9 @@
 
 namespace GLSL
 {
+    /**
+     * @brief The Struct class represents a structure in the GLSL language.
+     */
     class Struct : public Variable
     {
     public:
@@ -15,6 +18,10 @@ namespace GLSL
         }
     };
 
+    /**
+     * @brief The StructDecl helper class for store the declaration of a structure.
+     * @tparam T The type of the structure that inherits from Struct.
+     */
     template <class T>
     class StructDecl 
     {
