@@ -9,14 +9,14 @@
 
 namespace GLSL
 {
-    class Variable : std::enable_shared_from_this<Variable>
+    class Variable
     {
     public:
         std::string expression;
         std::string glsl_type;
 
-        std::vector<std::shared_ptr<Variable>> branches;
-        std::weak_ptr<Variable> origin;
+        std::vector<Variable *> branches;
+        Variable * origin = nullptr;
 
         Variable(std::string glsl_type) 
             : glsl_type(glsl_type), 
@@ -29,14 +29,19 @@ namespace GLSL
         {
         }
 
-        Variable(std::string glsl_type, std::string token, std::weak_ptr<Variable> origin)
+        Variable(std::string glsl_type, std::string token, Variable* origin)
             : glsl_type(glsl_type), expression(token), origin(origin)
         {
-            if (origin.lock())
-                origin.lock()->branches.push_back(shared_from_this());
+            if (origin)
+                origin->branches.push_back(this);
         }
 
-        static std::string bin_exp(std::string token, Variable *left, Variable *right)
+        void *operator new(size_t size)
+        {
+            return Parser::allocate(size);
+        }
+
+        static std::string bin_exp(std::string token, const Variable *left, const Variable *right)
         {
             return "(" + left->get_expression() + " " + token + " " + right->get_expression() + ")";
         }
@@ -53,15 +58,10 @@ namespace GLSL
 
         std::string get_expression() const
         {
-            if (origin.lock())
-                return origin.lock()->get_expression() + "." + expression;
+            if (origin)
+                return origin->get_expression() + "." + expression;
             else
                 return expression;
-        }
-
-        std::weak_ptr<Variable> This()
-        {
-            return weak_from_this();
         }
     };
 }

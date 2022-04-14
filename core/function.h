@@ -11,16 +11,16 @@ namespace GLSL
         std::string definition;
         std::string symbol;
 
-        Function(std::string symbol) : symbol(symbol) {}
+        Function(const std::string& symbol) : symbol(symbol) {}
 
     private:
-        std::string unwrap_others(std::string &arguments)
+        static std::string unwrap_others(std::string &arguments)
         {
             return arguments;
         }
 
         template <typename U, typename... Args_>
-        std::string unwrap_others(std::string &arguments, U &u, Args_ &...others)
+        static std::string unwrap_others(std::string &arguments, U &u, Args_ &...others)
         {
             if (arguments.empty())
                 arguments += u.get_declaration();

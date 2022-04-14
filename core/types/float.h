@@ -15,7 +15,7 @@ namespace GLSL
         {
         }
 
-        Float(std::string token, std::weak_ptr<Variable> origin)
+        Float(std::string token, Variable* origin)
             : Variable("float", token, origin)
         {
         }
@@ -29,6 +29,11 @@ namespace GLSL
         Float(float value)
             : Variable("float", std::to_string(value))
         {
+        }
+
+        void *operator new(size_t size)
+        {
+            return Variable::operator new(size);
         }
 
         Float &operator=(Float &other)

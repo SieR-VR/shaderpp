@@ -15,7 +15,7 @@ namespace GLSL
         {
         }
 
-        Int(std::string name, std::weak_ptr<Variable> origin)
+        Int(std::string name, Variable* origin)
             : Variable("int", name, origin)
         {
         }
@@ -24,6 +24,11 @@ namespace GLSL
             : Variable("int")
         {
             Parser::record("int" + this->get_expression() + " = " + other.get_expression());
+        }
+
+        void *operator new(size_t size)
+        {
+            return Variable::operator new(size);
         }
 
         Int &operator=(const Int &other)

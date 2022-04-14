@@ -18,6 +18,22 @@ namespace GLSL
         inline static int arg_index = 0;
         inline static std::string argument_declaration = "";
 
+        inline static std::vector<void *> allocated;
+
+        static void *allocate(size_t size)
+        {
+            void *ptr = malloc(size);
+            allocated.push_back(ptr);
+            return ptr;
+        }
+
+        static void free_all()
+        {
+            for (auto ptr : allocated)
+                free(ptr);
+            allocated.clear();
+        }
+
         /**
          * @brief The function records the function line
          */
@@ -93,6 +109,7 @@ namespace GLSL
             recorder.clear();
             arg_index = 0;
             argument_declaration = "";
+            free_all();
 
             return function;
         }
@@ -113,6 +130,7 @@ namespace GLSL
             definition += footer;
 
             recorder.clear();
+            free_all();
 
             return definition;
         }

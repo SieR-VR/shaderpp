@@ -8,9 +8,7 @@ add_subdirectory(test)
 add_subdirectory(core)
 
 target_link_libraries(shaderpp 
-    glfw 
     core
-    GLEW
 )
 
 include(CTest)

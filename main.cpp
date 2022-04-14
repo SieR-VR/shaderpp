@@ -8,8 +8,6 @@
 #include "core/program.h"
 #include "core/uniform.h"
 
-#include <GLFW/glfw3.h>
-
 class Phong : public GLSL::Shader
 {
     GLSL::Output<GLSL::Vec4> FragColor;
@@ -24,7 +22,7 @@ public:
     GLSL::Uniform<GLSL::Vec3> objectColor;
 
     Phong()
-        : GLSL::Shader("300", "es", GL_FRAGMENT_SHADER),
+        : GLSL::Shader("300", "es"),
           FragColor("FragColor", this),
           Normal("Normal", this),
           FragPos("FragPos", this),
@@ -60,23 +58,6 @@ public:
 
 int main(int argc, char *argv[])
 {
-    GLFWwindow *window;
-    if (!glfwInit())
-        return -1;
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
-
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-    glewInit();
-
     Phong shader;
     shader.compile();
     

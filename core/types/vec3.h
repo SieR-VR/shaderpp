@@ -17,35 +17,40 @@ namespace GLSL
 
         Vec3(std::string symbol)
             : Variable("vec3", symbol),
-              x("x", This()), y("y", This()), z("z", This()),
-              r("r", This()), g("g", This()), b("b", This()),
-              s("s", This()), t("t", This()), p("p", This())
+              x("x", this), y("y", this), z("z", this),
+              r("r", this), g("g", this), b("b", this),
+              s("s", this), t("t", this), p("p", this)
         {
         }
 
-        Vec3(std::string symbol, std::weak_ptr<Variable> origin)
+        Vec3(std::string symbol, Variable* origin)
             : Variable("vec3", symbol, origin),
-              x("x", This()), y("y", This()), z("z", This()),
-              r("r", This()), g("g", This()), b("b", This()),
-              s("s", This()), t("t", This()), p("p", This())
+              x("x", this), y("y", this), z("z", this),
+              r("r", this), g("g", this), b("b", this),
+              s("s", this), t("t", this), p("p", this)
         {
         }
 
         Vec3(const Vec3 &other)
             : Variable("vec3"),
-              x("x", This()), y("y", This()), z("z", This()),
-              r("r", This()), g("g", This()), b("b", This()),
-              s("s", This()), t("t", This()), p("p", This())
+              x("x", this), y("y", this), z("z", this),
+              r("r", this), g("g", this), b("b", this),
+              s("s", this), t("t", this), p("p", this)
         {
             Parser::record("vec3 " + this->get_expression() + " = " + other.get_expression());
         }
 
         Vec3(const Float &f1, const Float &f2, const Float &f3)
             : Variable("vec3", "vec3(" + f1.get_expression() + ", " + f2.get_expression() + ", " + f3.get_expression() + ")"),
-              x("x", This()), y("y", This()), z("z", This()),
-              r("r", This()), g("g", This()), b("b", This()),
-              s("s", This()), t("t", This()), p("p", This())
+              x("x", this), y("y", this), z("z", this),
+              r("r", this), g("g", this), b("b", this),
+              s("s", this), t("t", this), p("p", this)
         {
+        }
+
+        void *operator new(size_t size)
+        {
+            return Variable::operator new(size);
         }
 
         Vec3 &operator=(const Vec3 &other)

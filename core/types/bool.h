@@ -15,7 +15,7 @@ namespace GLSL
         {
         }
 
-        Bool(std::string token, std::weak_ptr<Variable> origin)
+        Bool(std::string token, Variable *origin)
             : Variable("bool", token, origin)
         {
         }
@@ -24,6 +24,11 @@ namespace GLSL
             : Variable("bool")
         {
             Parser::record("bool" + this->get_expression() + " = " + other.get_expression());
+        }
+
+        void *operator new(size_t size)
+        {
+            return Variable::operator new(size);
         }
 
         Bool &operator=(const Bool &other)

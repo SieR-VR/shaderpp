@@ -1,8 +1,6 @@
 #ifndef UNIFORM_H_
 #define UNIFORM_H_
 
-#include <GL/glew.h>
-
 #include "types/float.h"
 #include "types/vec2.h"
 #include "types/vec3.h"
@@ -20,17 +18,14 @@ namespace GLSL
     class Uniform<Float> : public Float
     {
     public:
-        GLuint location;
-        
+    
         Uniform(const std::string& name, Shader *shader) : Float(name) 
         {
             shader->builder.add_uniforms({ *this });
-            shader->register_uniform(name, &location);
         }
 
         void set(const float &value)
         {
-            glUniform1f(location, value);
         }
     };
 
@@ -38,17 +33,14 @@ namespace GLSL
     class Uniform<Vec2> : public Vec2
     {
     public:
-        GLuint location;
         
         Uniform(const std::string& name, Shader *shader) : Vec2(name) 
         {
             shader->builder.add_uniforms({ *this });
-            shader->register_uniform(name, &location);
         }
 
         void set(const float &x, const float &y)
         {
-            glUniform2f(location, x, y);
         }
     };
 
@@ -56,17 +48,14 @@ namespace GLSL
     class Uniform<Vec3> : public Vec3
     {
     public:
-        GLuint location;
         
         Uniform(const std::string& name, Shader *shader) : Vec3(name) 
         {
             shader->builder.add_uniforms({ *this });
-            shader->register_uniform(name, &location);
         }
 
         void set(const float &x, const float &y, const float &z)
         {
-            glUniform3f(location, x, y, z);
         }
     };
 
@@ -74,17 +63,14 @@ namespace GLSL
     class Uniform<Vec4> : public Vec4
     {
     public:
-        GLuint location;
         
         Uniform(const std::string& name, Shader *shader) : Vec4(name) 
         {
             shader->builder.add_uniforms({ *this });
-            shader->register_uniform(name, &location);
         }
 
         void set(const float &x, const float &y, const float &z, const float &w)
         {
-            glUniform4f(location, x, y, z, w);
         }
     };
 
