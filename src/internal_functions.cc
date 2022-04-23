@@ -1,14 +1,4 @@
-#ifndef INTERNAL_FUNCTIONS_H_
-#define INTERNAL_FUNCTIONS_H_
-
-#include "parser.h"
-
-#include "types/float.h"
-#include "types/vec2.h"
-#include "types/vec3.h"
-#include "types/vec4.h"
-
-#include "types/int.h"
+#include "internal_functions.h"
 
 namespace GLSL
 {
@@ -72,5 +62,3 @@ namespace GLSL
         return *result;
     }
 }
-
-#endif

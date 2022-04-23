@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "program.h"
 
 namespace GLSL

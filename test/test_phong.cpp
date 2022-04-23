@@ -1,12 +1,12 @@
 #include <iostream>
 #include <fstream>
 
-#include "core/variable.h"
-#include "core/struct.h"
+#include "variable.h"
+#include "struct.h"
 
-#include "core/internal_functions.h"
-#include "core/program.h"
-#include "core/uniform.h"
+#include "internal_functions.h"
+#include "program.h"
+#include "uniform.h"
 
 class Phong : public GLSL::Shader
 {

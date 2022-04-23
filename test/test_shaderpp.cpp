@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "../core/variable.h"
-#include "../core/internal_functions.h"
+#include "variable.h"
+#include "internal_functions.h"
 
 #include "regex/regex_builder.h"
 

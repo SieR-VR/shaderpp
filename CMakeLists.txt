@@ -2,14 +2,15 @@ cmake_minimum_required(VERSION 3.0.0)
 project(shaderpp VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
-add_executable(shaderpp main.cpp)
+set(SHADERPP_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-add_subdirectory(test)
-add_subdirectory(core)
-
-target_link_libraries(shaderpp 
-    core
+file(GLOB SOURCE_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/types/*.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc"
 )
 
-include(CTest)
-add_test(test_shaderpp test/test_shaderpp)
+add_library(shaderpp STATIC ${SOURCE_FILES})
+target_include_directories(shaderpp 
+    PUBLIC ${SHADERPP_INCLUDE_DIR})
+
+add_subdirectory(test)
