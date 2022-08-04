@@ -230,4 +230,4 @@ struct Function
     std::string toString(size_t indent) const;
 };
 
-#endif
+#endif // _CODEGEN_BUILDER_H_
